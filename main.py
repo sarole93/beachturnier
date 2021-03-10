@@ -775,10 +775,13 @@ class TurnierApp(App):
             
             modification_times = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(times)) for times in modification_times]
             
-            self.save_files = '[b]Gespeicherte Turniere:[/b]\n'
+			self.save_files = '[b]Gespeicherte Turniere:[/b]\n'
             self.save_files += '\n'.join(files)
             self.save_dates = 'Änderungsdatum\n'
             self.save_dates += '\n'.join(modification_times)
+		else:
+            self.save_files = ''
+			self.save_dates = ''
 
 if __name__ == '__main__':
     import bugs
