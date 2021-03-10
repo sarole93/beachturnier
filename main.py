@@ -410,7 +410,7 @@ class RoundPage(Widget):
             self.courts_pool_2 = 0
             self.ids.courts_pool_2.text = str(0)
 
-        self.current = Round(app.next_round, self.courts_mixed, app.players, self.courts_pool_1, self.courts_pool_2)
+        self.current = Round(app.next_round, self.courts_mixed, app.players, self.courts_pool_1, self.courts_pool_2, num_tries = app.num_tries)
         
         if self.current.pool_1_courts < self.courts_pool_1:
             app.print_error('round', 'Nicht genug Spieler / Paarungen. Belege nur {} Herren Felder.'.format(self.current.pool_1_courts))

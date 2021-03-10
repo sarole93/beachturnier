@@ -62,8 +62,8 @@ class Round:
         n_filled = 0
         teams_pool_1 = []
         teams_pool_2 = []
-        teams_mixed = []   
-        tries_max = num_tries   
+        teams_mixed = []
+        tries_max = num_tries
         
         # while not all teams are filled as desired draw pairs
         while n_filled < n_max_init or n_1_filled < n_1 or n_2_filled < n_2:
