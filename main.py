@@ -538,7 +538,7 @@ class TournamentRow(GridLayout):
 
 class TurnierApp(App):
     # Setup app variables
-    version = 'v1.5.2'
+    version = 'v1.5.3'
     
     players, rounds = None, None
     next_round = None
@@ -761,11 +761,10 @@ class TurnierApp(App):
             os.remove(filepath_players)
             os.remove(filepath_tournament)
             self.read_data()
+            self.print_saves()
         except:
             self.print_error('general', 'File existiert nicht.')
         
-        Clock.schedule_once(lambda x: self.print_saves(), 0.5)
-
     def print_saves(self):
         files = list(set([f.replace(self.file_players_ending,'').replace(self.file_tournament_ending,'') for f in os.listdir(self.cache_folder)]))
         
