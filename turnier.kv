@@ -1,0 +1,658 @@
+<TextLabel@Label>:
+    text_size: self.size
+    font_size: app.font_size_text
+    halign: 'left'
+    valign: 'top'
+<InputLabel@Label>:
+    text_size: self.size
+    font_size: app.font_size_text
+    halign: 'left'
+    valign: 'middle'
+<HeaderLabel@Label>:
+    text_size: self.size
+    font_size: app.font_size_header
+    halign: 'left'
+    valign: 'top'
+    size_hint_y: None
+    height: 1.5*app.row_height
+<NumInput@NumInputPat>:
+    font_size: app.font_size_text
+    halign: 'right'
+    valign: 'middle'
+    size_hint: None, None
+    height: app.row_height
+    width: app.row_height
+    multiline: False
+<TextInput_@TextInputPat>:
+    font_size: app.font_size_text
+    halign: 'left'
+    valign: 'middle'
+    multiline: False
+<ConfirmButton@Button>:
+    font_size: app.font_size_button
+    halign: 'center'
+    size_hint_y: None
+    height: app.row_height
+<Background@RoundedRectangle>:
+    radius: [(40*app.scaling,40*app.scaling),(40*app.scaling,40*app.scaling),(40*app.scaling,40*app.scaling),(40*app.scaling,40*app.scaling)]
+    
+<MainScreen>:
+    canvas.before:
+        Color:
+            rgba: (.2,.2,.2,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Navigation:
+        id: navigation
+        size: root.width - app.padding, root.height - app.button_height - 1.5*app.padding
+        pos: root.x + app.padding/2, root.y + app.padding + app.button_height
+    Button:
+        id: save_button
+        disabled: app.save_status
+        size: (root.width-app.padding) * 0.25, app.button_height
+        pos: root.x + root.width - self.width - app.padding / 2, root.y + app.padding / 2
+        halign: 'center'
+        text: 'Speichern'
+        font_size: app.font_size_button
+        on_release:
+            app.save_data()
+            app.save_status = True
+    Button:
+        size: (root.width-app.padding) * 0.25, app.button_height
+        pos: root.x + app.padding / 2, root.y + app.padding / 2
+        halign: 'center'
+        text: 'Optionen'
+        font_size: app.font_size_button
+        on_release:
+            root.show_options()
+            
+<Options>:
+    canvas.before:
+        Color:
+            rgba: (.5,.5,.5,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    columns: 1
+    rows: 12
+    padding: app.padding
+    spacing: 0, 24*app.scaling
+    row_default_height: app.row_height
+    rows_minimum: {10:self.height-(self.rows-1)*self.row_default_height-(self.rows-1)*self.spacing[1]-2*app.padding}
+    row_force_default: True
+    BoxLayout:
+        InputLabel:
+            size_hint_x: .75
+            markup: True
+            text: 'Savefile / Turniername:   [b]' + app.current_savefile + '[/b]'
+        Label:
+            size_hint_x: .25
+    BoxLayout:
+        InputLabel:
+            size_hint_x: .75
+            text: 'Name des Savefiles ändern'
+        TextInput_:
+            size_hint_x: .25
+            id: new_filename
+            text: app.current_savefile
+    BoxLayout:
+        Label:
+            size_hint_x: .75
+        ConfirmButton:
+            size_hint_x: .25
+            text: 'Übernehmen'
+            on_release:
+                root.update(app)
+                app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+                app.root.ids.navigation.ids.tournamentpage.print_matchups(app.rounds)
+    Label:
+    BoxLayout:
+        InputLabel:
+            size_hint_x: .75
+            text: 'Aus Savefile neu laden'
+        ConfirmButton:
+            size_hint_x: .25
+            text: 'Laden'
+            on_release:
+                root.reload(app)
+    BoxLayout:
+        InputLabel:
+            size_hint_x: .75
+            text: 'Savefile löschen / Turnier zurücksetzen'
+        ConfirmButton:
+            size_hint_x: .25
+            text: 'Löschen'
+            on_release:
+                root.delete(app)
+    BoxLayout:
+        InputLabel:
+            size_hint_x: .5
+            text: app.change_message
+        ConfirmButton:
+            size_hint_x: .25
+            disabled: app.apply_changes
+            text: 'Abbrechen'
+            on_release:
+                root.cancel(app)
+        ConfirmButton:
+            size_hint_x: .25
+            disabled: app.apply_changes
+            text: 'Bestätigen'
+            on_release:
+                root.apply(app)
+                app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+                app.root.ids.navigation.ids.tournamentpage.print_matchups(app.rounds)
+    Label:
+    BoxLayout:
+        InputLabel:
+            size_hint_x: 0.5
+            text: 'xlsx Savefiles'
+        ConfirmButton:
+            size_hint_x: 0.25
+            text: 'Importieren'
+            on_release: root.show_import()
+        ConfirmButton:
+            size_hint_x: 0.25
+            text: 'Exportieren'
+            on_release: root.show_export()
+    Label:
+    BoxLayout:
+        TextLabel:
+            size_hint_x: .6
+            markup: True
+            text: app.save_files
+        TextLabel:
+            size_hint_x: .4
+            halign: 'right'
+            text: app.save_dates
+    BoxLayout:
+        TextLabel:
+            size_hint_x: .75
+            valign: 'bottom'
+            font_size: app.font_size_notification
+            text: '(c) Sascha Leonhardt'
+        TextLabel:
+            size_hint_x: .25
+            valign: 'bottom'
+            halign: 'right'
+            font_size: app.font_size_notification
+            text: app.version
+                
+<LoadDialog>:
+    cols: 1
+    rows: 1
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            rootpath: app.savepath
+        BoxLayout:
+            size_hint_y: None
+            height: 1.5*app.row_height
+            ConfirmButton:
+                text: 'Abbrechen'
+                height: 1.5*app.row_height
+                on_release: root.cancel()
+            ConfirmButton:
+                text: 'Laden'
+                height: 1.5*app.row_height
+                on_release: 
+                    root.import_data(app, filechooser.path, filechooser.selection)
+                    app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+                    app.root.ids.navigation.ids.tournamentpage.print_matchups(app.rounds)
+
+<SaveDialog>:
+    cols: 1
+    rows: 1
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            rootpath: app.savepath
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+        TextInput_:
+            id: text_input
+            size_hint_y: None
+            font_size: 1.5*app.font_size_text
+            height: 1.5*app.row_height
+        BoxLayout:
+            size_hint_y: None
+            height: 1.5*app.row_height
+            ConfirmButton:
+                text: 'Abbrechen'
+                height: 1.5*app.row_height
+                on_release: root.cancel()
+            ConfirmButton:
+                text: 'Speichern'
+                height: 1.5*app.row_height
+                on_release: root.export_data(app, filechooser.path, text_input.text)
+            
+<Navigation>:
+    background_color: (.2,.2,.2,0)
+    do_default_tab: False
+    tab_width: self.width / 4 - 4*app.scaling
+    tab_height: app.button_height
+    TabbedPanelItem:
+        text: 'Spieler-\nübersicht'
+        font_size: app.font_size_button
+        PlayerPage:
+            id: playerpage
+            size: root.width, app.button_height
+            pos: root.x, root.y + app.button_height
+    TabbedPanelItem:
+        text: 'Spieler\nbearbeiten'
+        font_size: app.font_size_button
+        PoolPage:
+            size: root.width, app.button_height
+            pos: root.x, root.y + app.button_height
+    TabbedPanelItem:
+        text: 'Neue Runde\neintragen'
+        font_size: app.font_size_button
+        RoundPage:
+            size: root.width, app.button_height
+            pos: root.x, root.y + app.button_height
+    TabbedPanelItem:
+        text: 'Turnierverlauf'
+        font_size: app.font_size_button
+        TournamentPage:
+            id: tournamentpage
+            size: root.width, app.button_height
+            pos: root.x, root.y + app.button_height
+
+<PlayerPage>:
+    canvas.before:
+        Color:
+            rgba: (.3,.3,.3,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    HeaderLabel:
+        id: header
+        pos: root.x + app.padding, root.y + root.height - self.height - app.padding
+        width: root.width-2*app.padding
+        text: 'Spielerübersicht'
+    ScrollView:
+        do_scroll_x: False
+        pos: root.x + app.padding, root.y + root.height - self.height - app.padding - header.height
+        size: root.width-2*app.padding, root.height-2*app.padding
+        GridLayout:
+            id: container
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+            row_force_default: True
+            row_default_height: 1.2*app.font_size_text
+            ConfirmButton:
+                text: 'Laden...'
+                on_release:
+                    app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+    ConfirmButton:
+        id: placements_button
+        text: 'Platzierungen'
+        width: 220*app.scaling
+        pos: root.x + root.width - self.width - app.padding, root.y + root.height - self.height - app.padding
+        on_release: root.show_placements()
+            
+<PlayerRow>:
+    cols: 5
+    cols_minimum: {0:150*app.scaling, 1:root.width-540*app.scaling, 2:120*app.scaling, 3:120*app.scaling, 4:150*app.scaling}
+    TextLabel:
+        id: pool
+    TextLabel:
+        id: name
+    TextLabel:
+        id: games
+        halign: 'center'
+    TextLabel:
+        id: points
+        halign: 'center'
+    TextLabel:
+        id: points_diff
+        halign: 'center'
+        
+<Placements>:
+    cols: 1
+    rows: 2
+    padding: app.padding
+    rows_minimum: {0: 200*app.scaling+2*app.row_height, 1: self.height}
+    row_force_default: True
+    canvas.before:
+        Color:
+            rgba: (.5,.5,.5,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        id: top_placements
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+            Image:
+                source: 'img/2nd.png'
+                size_hint_y: None
+                height: 140*app.scaling
+            Label:
+                size_hint_y: None
+                height: 20*app.scaling
+            TextLabel:
+                halign: 'center'
+                text: root.second
+                size_hint_y: None
+                height: 2*app.row_height
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+            Image:
+                source: 'img/1st.png'
+                size_hint_y: None
+                height: 180*app.scaling
+            Label:
+                size_hint_y: None
+                height: 20*app.scaling
+            TextLabel:
+                halign: 'center'
+                text: root.first
+                size_hint_y: None
+                height: 2*app.row_height
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+            Image:
+                source: 'img/3rd.png'
+                size_hint_y: None
+                height: 100*app.scaling
+            Label:
+                size_hint_y: None
+                height: 20*app.scaling
+            TextLabel:
+                halign: 'center'
+                text: root.third
+                size_hint_y: None
+                height: 2*app.row_height
+    ScrollView:
+        do_scroll_x: False
+        GridLayout:
+            id: container
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+            row_force_default: True
+            row_default_height: 1.2*app.font_size_text
+            
+<PlacementsRow>:
+    cols: 5
+    cols_minimum: {0:120*app.scaling, 1:root.width-510*app.scaling, 2:120*app.scaling, 3:120*app.scaling, 4:150*app.scaling}
+    TextLabel:
+        markup: True
+        id: place
+    TextLabel:
+        id: name
+    TextLabel:
+        id: games
+        halign: 'center'
+    TextLabel:
+        id: points
+        halign: 'center'
+    TextLabel:
+        id: points_diff
+        halign: 'center'
+
+
+<PoolPage>:
+    canvas.before:
+        Color:
+            rgba: (.3,.3,.3,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    GridLayout:
+        columns: 1
+        rows: 3
+        pos: root.x + app.padding, root.y + app.padding
+        width: root.width - 2* app.padding
+        height: root.height - 2* app.padding
+        rows_minimum: {0:1.5*app.row_height, 1:11*app.row_height, 2:root.height- 2*app.padding-12.5*app.row_height}
+        row_force_default: True
+        HeaderLabel:
+            text: 'Spieler-Pools bearbeiten'
+        GridLayout:
+            columns: 1
+            rows: 11
+            row_default_height: app.row_height
+            row_force_default: True
+            TextLabel:
+                text: 'Mehrere Spieler mit Komma trennen.'
+            TextLabel:
+                valign: 'bottom'
+                text: 'Erstelle oder verschiebe Spieler in Pool 1:'
+            TextInput_:
+                id: player_to_1
+            TextLabel:
+                valign: 'bottom'
+                text: 'Erstelle oder verschiebe Spieler in Pool 2:'
+            TextInput_:
+                id: player_to_2
+            TextLabel:
+                valign: 'bottom'
+                text: 'Pausiere Spieler:'
+            TextInput_:
+                id: bench_player
+            TextLabel:
+                valign: 'bottom'
+                text: 'Lösche Spielerdaten:'
+            TextInput_:
+                id: delete_player
+            Label:
+            BoxLayout:
+                Label:
+                    size_hint_x: 0.66
+                ConfirmButton:
+                    size_hint_x: 0.33
+                    text: 'Übernehmen'
+                    on_release:
+                        root.adjust_pools(app)
+                        app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+        TextLabel:
+            color: 1,0,0,1
+            valign: 'bottom'
+            text: app.message_log_player
+
+<RoundPage>:
+    canvas.before:
+        Color:
+            rgba: (.3,.3,.3,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    GridLayout:
+        columns: 1
+        rows: 10
+        pos: root.x + app.padding, root.y + app.padding
+        width: root.width - 2* app.padding
+        height: root.height - 2* app.padding
+        rows_minimum: {0:1.5*app.row_height, 1:app.row_height, 2:app.row_height, 3:app.row_height, 4:app.row_height, 5:1.5*app.row_height, 6:app.row_height, 7:app.row_height, 8:6*app.row_height, 9:root.height-2*app.padding-15*app.row_height}
+        row_force_default: True
+        BoxLayout:
+            orientation: 'horizontal'
+            HeaderLabel:
+                size_hint_x: 0.6
+                text: 'Runde ' + str(root.round)
+            BoxLayout:
+                size_hint_x: 0.4
+                orientation: 'vertical'
+                ConfirmButton:
+                    disabled: app.round_save_status
+                    text: 'Ziehung bestätigen'
+                    on_release:
+                        root.pass_round(app)
+                        app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+                        app.root.ids.navigation.ids.tournamentpage.print_matchups(app.rounds)
+                Label:
+                    size_hint_y: 1
+        BoxLayout:
+            orientation: 'horizontal'
+            InputLabel:
+                size_hint_x: 0.3
+                text: 'Felder Herren'
+            NumInput:
+                id: courts_pool_1
+                text: root.courts_pool_1_preset
+            Label:
+                size_hint_x: 0.7
+        BoxLayout:
+            orientation: 'horizontal'
+            InputLabel:
+                size_hint_x: 0.3
+                text: 'Felder Damen'
+            NumInput:
+                id: courts_pool_2
+                text: root.courts_pool_2_preset
+            Label:
+                size_hint_x: 0.3
+            ConfirmButton:
+                size_hint_x: 0.4
+                text: 'Runde ziehen'
+                on_release: root.new_round(app)
+        BoxLayout:
+            orientation: 'horizontal'
+            InputLabel:
+                size_hint_x: 0.3
+                text: 'Felder Mixed'
+            NumInput:
+                id: courts_mixed
+                text: root.courts_mixed_preset
+            Label:
+                size_hint_x: 0.7
+        Label:
+        BoxLayout:
+            orientation: 'horizontal'
+            HeaderLabel:
+                size_hint_x: 0.6
+                text: 'Ergebnisse eintragen'
+            BoxLayout:
+                size_hint_x: 0.4
+                orientation: 'vertical'
+                ConfirmButton:
+                    text: 'Ergebnisse bestätigen'
+                    on_release: 
+                        root.resolve_round(app)
+                        app.root.ids.navigation.ids.playerpage.print_pool(app.players)
+                        app.root.ids.navigation.ids.tournamentpage.print_matchups(app.rounds)
+                        score_1.text = ''
+                        score_2.text = ''
+                        court.text = root.results_court
+                Label:
+                    size_hint_y: 1
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10*app.scaling
+            Label:
+                size_hint_x: 0.5
+            InputLabel:
+                size_hint_x: None
+                width: 120*app.scaling
+                halign: 'right'
+                text: 'Runde'
+            NumInput:
+                id: round
+                text: root.results_round
+            InputLabel:
+                size_hint_x: None
+                width: 80*app.scaling
+                halign: 'right'
+                text: 'Feld'
+            NumInput:
+                id: court
+                text: root.results_court
+            InputLabel:
+                size_hint_x: None
+                width: 100*app.scaling
+                halign: 'right'
+                text: 'Score'
+            NumInput:
+                id: score_1
+                text: root.score_1
+            InputLabel:
+                size_hint_x: None
+                width: 20*app.scaling
+                halign: 'center'
+                text: ':'
+            NumInput:
+                id: score_2
+                text: root.score_2
+            Label:
+                size_hint_x: 0.5
+        Label:
+        ScrollView:
+            do_scroll_x: False
+            GridLayout:
+                id: container
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                row_default_height: 2.4*app.font_size_header
+                row_force_default: True
+        TextLabel:
+            color: 1,0,0,1
+            font_size: app.font_size_notification
+            valign: 'bottom'
+            text: app.message_log_round
+             
+<NewRoundRow>:
+    cols: 2
+    rows: 2
+    cols_minimum: {0:200*app.scaling, 1:(root.width-200*app.scaling)}
+    row_default_height: 1.2*app.font_size_header
+    row_force_default: True
+    TextLabel:
+        id: court
+        font_size: app.font_size_header
+        halign: 'center'
+    TextLabel:
+        id: current_team_1
+        font_size: app.font_size_header
+    TextLabel:
+        text: 'vs'
+        font_size: app.font_size_header
+        halign: 'center'
+    TextLabel:
+        id: current_team_2
+        font_size: app.font_size_header
+
+<TournamentPage>:
+    canvas.before:
+        Color:
+            rgba: (.3,.3,.3,1)
+        Background:
+            pos: self.pos
+            size: self.size
+    ScrollView:
+        do_scroll_x: False
+        pos: root.x + app.padding/2, root.y + root.height - self.height - app.padding/2
+        size: root.width-app.padding, root.height-app.padding
+        GridLayout:
+            id: container
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+            row_default_height: 1.2*app.font_size_text
+            row_force_default: True
+            
+<TournamentRow>:
+    cols: 4
+    cols_minimum: {0:120*app.scaling, 1:(root.width-240*app.scaling)/2, 2:(root.width-240*app.scaling)/2, 3:120*app.scaling}
+    TextLabel:
+        id: round
+    TextLabel:
+        id: team_1
+    TextLabel:
+        id: team_2
+    TextLabel:
+        id: score
