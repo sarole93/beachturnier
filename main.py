@@ -591,8 +591,7 @@ class TurnierApp(App):
         else:
             self.savepath = os.getcwd()
             self.scaling = 0.3
-            
-        Window.size = (1080*self.scaling, 1920*self.scaling)
+            Window.size = (1080*self.scaling, 1920*self.scaling)
         
         # Define sizes of elements
         self.padding = 50 * self.scaling
