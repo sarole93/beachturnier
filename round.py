@@ -214,6 +214,10 @@ class Round:
 
     def resolve(self, players, court, score_1, score_2):
         "Update Matches and Players for a given score."
+        if self.matches[court-1].locked == 1:
+            old_score_1 = self.matches[court-1].score_1
+            old_score_2 = self.matches[court-1].score_2
+            self.unresolve(players, court, old_score_1, old_score_2)
         if self.matches[court-1].locked == 0:
             self.matches[court-1].score_1 = score_1
             self.matches[court-1].score_2 = score_2
@@ -242,3 +246,29 @@ class Round:
         else:
             success = 0
         return success
+    
+    def unresolve(self, players, court, score_1, score_2):
+        "Update Matches and Players for a given score."
+        self.matches[court-1].score_1 = None
+        self.matches[court-1].score_2 = None
+        if score_1 == score_2:
+            players[self.teams[2*(court-1)][0]].undraw(score_1, score_2)
+            players[self.teams[2*(court-1)][1]].undraw(score_1, score_2)
+            players[self.teams[2*(court-1)+1][0]].undraw(score_1, score_2)
+            players[self.teams[2*(court-1)+1][1]].undraw(score_1, score_2)
+        else:
+            if score_1 > score_2:
+                winner_1 = self.teams[2*(court-1)][0]
+                winner_2 = self.teams[2*(court-1)][1]
+                loser_1 = self.teams[2*(court-1)+1][0]
+                loser_2 = self.teams[2*(court-1)+1][1]
+            elif score_2 > score_1:
+                winner_1 = self.teams[2*(court-1)+1][0]
+                winner_2 = self.teams[2*(court-1)+1][1]
+                loser_1 = self.teams[2*(court-1)][0]
+                loser_2 = self.teams[2*(court-1)][1]
+            players[winner_1].unwin(score_1, score_2)
+            players[winner_2].unwin(score_1, score_2)
+            players[loser_1].unlose(score_1, score_2)
+            players[loser_2].unlose(score_1, score_2)
+        self.matches[court-1].locked = 0

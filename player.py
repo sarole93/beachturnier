@@ -52,3 +52,28 @@ class Player:
             self.pool = 1 - self.pool
         else:
             self.pool = new_pool
+
+    def unwin(self, score_1, score_2):
+        "Update stats when undoing winning. Scores are not ordered."
+        self.wins -= 1
+        if score_1 > score_2:
+            self.points_won -= score_1
+            self.points_lost -= score_2
+        elif score_2 > score_1:
+            self.points_won -= score_2
+            self.points_lost -= score_1
+
+    def undraw(self, score_1, score_2):
+        "Update stats in case of undoing draw."
+        self.draws -= 1
+        self.points_won -= score_1
+        self.points_lost -= score_1
+        
+    def unlose(self, score_1, score_2):
+        "Update stats when undoing losing. Scores are not ordered."
+        if score_1 > score_2:
+            self.points_won -= score_2
+            self.points_lost -= score_1
+        elif score_2 > score_1:
+            self.points_won -= score_1
+            self.points_lost -= score_2
