@@ -218,6 +218,11 @@ class Round:
             old_score_1 = self.matches[court-1].score_1
             old_score_2 = self.matches[court-1].score_2
             self.unresolve(players, court, old_score_1, old_score_2)
+        if score_1 == 0 and score_2 == 0:
+            self.matches[court-1].score_1 = None
+            self.matches[court-1].score_2 = None
+            success = 1
+            return success
         if self.matches[court-1].locked == 0:
             self.matches[court-1].score_1 = score_1
             self.matches[court-1].score_2 = score_2
